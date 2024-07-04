@@ -12,7 +12,10 @@ const restify = require('restify');
 const {
     CloudAdapter,
     ConfigurationServiceClientCredentialFactory,
-    createBotFrameworkAuthenticationFromConfiguration
+    createBotFrameworkAuthenticationFromConfiguration,
+    MemoryStorage,
+    ConversationState,
+    UserState
 } = require('botbuilder');
 
 // This bot's main dialog.
@@ -64,8 +67,12 @@ const onTurnErrorHandler = async (context, error) => {
 // Set the onTurnError for the singleton CloudAdapter.
 adapter.onTurnError = onTurnErrorHandler;
 
+const memoryStorage = new MemoryStorage()
+const conversationState = new ConversationState(memoryStorage)
+const userState = new UserState(memoryStorage)
+
 // Create the main dialog.
-const myBot = new EchoBot();
+const myBot = new EchoBot(conversationState, userState);
 
 // Listen for incoming requests.
 server.post('/api/messages', async (req, res) => {
